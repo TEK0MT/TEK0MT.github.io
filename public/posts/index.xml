@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Rev</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on Rev</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>mohamedmttarekmt@gmail.com (TEKO)</managingEditor>
+    <webMaster>mohamedmttarekmt@gmail.com (TEKO)</webMaster>
+    <copyright>© 2026 TEKO</copyright>
+    <lastBuildDate>Tue, 05 May 2026 16:09:41 +0300</lastBuildDate><atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Paradise Ransomware</title>
+      <link>http://localhost:1313/posts/paradise-ransomware/</link>
+      <pubDate>Tue, 05 May 2026 16:09:41 +0300</pubDate>
+      <author>mohamedmttarekmt@gmail.com (TEKO)</author>
+      <guid>http://localhost:1313/posts/paradise-ransomware/</guid>
+      <description></description>
+      
+    </item>
+    
+  </channel>
+</rss>
