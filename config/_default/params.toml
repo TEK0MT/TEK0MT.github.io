@@ -25,8 +25,8 @@ disableImageOptimizationMD = false
 disableTextInHeader = false
 # backgroundImageWidth = 1200
 
- defaultBackgroundImage = "BackGround.webp" # used as default for background images
-# defaultFeaturedImage = "IMAGE.jpg" # used as default for featured images in all articles
+ defaultBackgroundImage = "magical-night-in-a-foggy-forest-village-under-a-starry-sky-tuk64eqig31nfttp.webp" # used as default for background images
+#defaultFeaturedImage = "BackGround2.webp" # used as default for featured images in all articles
 # defaultSocialImage = "/android-chrome-512x512.png" # used as default for social media sharing (Open Graph and Twitter)
 hotlinkFeatureImage = false
 # Thumbnail aspect ratio as a number (e.g., "1.5", "1.0", "1.777")
@@ -54,7 +54,7 @@ forgejoDefaultServer = "https://v11.next.forgejo.org"
 
 [homepage]
   layout = "background" # valid options: page, profile, hero, card, background, custom
-  homepageImage = "BackGround.webp" # used in: hero, and card
+  homepageImage = "magical-night-in-a-foggy-forest-village-under-a-starry-sky-tuk64eqig31nfttp.webp" # used in: hero, and card
   showRecent = true
   showRecentItems = 5
   showMoreLink = false
@@ -65,16 +65,15 @@ forgejoDefaultServer = "https://v11.next.forgejo.org"
   disableHeroImageFilter = false # only used when layout equals hero
 
 [article]
-  max_width = "max-w-7xl"
   showDate = true
   showViews = false
-  showLikes = true
+  showLikes = false
   showDateOnlyInArticle = false
   showDateUpdated = true
   showAuthor = true
   # showAuthorBottom = false
-  showHero = false
-  # heroStyle = "basic" # valid options: basic, big, background, thumbAndBackground
+  showHero = true
+  heroStyle = "background" # valid options: basic, big, background, thumbAndBackground
   layoutBackgroundBlur = true # only used when heroStyle equals background or thumbAndBackground
   layoutBackgroundHeaderSpace = true # only used when heroStyle equals background
   showBreadcrumbs = false
@@ -97,7 +96,7 @@ forgejoDefaultServer = "https://v11.next.forgejo.org"
   showAuthorsBadges = false
   showWordCount = true
   # sharingLinks = [ "linkedin", "twitter", "bluesky", "mastodon", "reddit", "pinterest", "facebook", "email", "whatsapp", "telegram", "line"]
-  showZenMode = false
+  showZenMode = true
   # externalLinkForceNewTab = false # disable to allow external links in the same tab (defaults to true)
 
 [list]

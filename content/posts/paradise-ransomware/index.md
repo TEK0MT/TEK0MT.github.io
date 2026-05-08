@@ -1,6 +1,5 @@
 +++
 date = '2026-05-05T16:09:41+03:00'
-draft = false
 title = 'Paradise Ransomware'
 +++
 # Executive summary
@@ -113,10 +112,23 @@ if it has no administration privilage it run it asks to run itself as administra
 
 
 after sub_4028F0 we go back to sub_402E60 it's intializing RSA using **CryptAcquireContextW**, then the function calls 
-sub_401780 to generate public and private key for RSA 1024-bit.  
+sub_401780.
+### sub_401780
+The function starts by asking the OS for Crypto keys using **CryptGenKey** ![alt text](image-17.png).
+Then at **0x04017EE** the malware exports the public key using **CryptExportKey** and by passing **6** as **dwBlobType** ![alt text](image-18.png)
+by inspecting ESI where the key is exported we can get the RSA length and it's 1024-bit RSA ![alt text](image-20.png)
+and then it calls **CryptExportKey** with **7** as **dwBlobType** to export the private key ![alt text](image-19.png)  
+
+
 So the malware uses RSA 1024-bit to encrypt files and then it encrypts the private key with the hardcoded RSA 2048-bit.  
 We can get the private key of the RSA 1024-bit but it's unique for every host so if we got the key we can decrypt only one host.  
 To decrypt all hosts we should get the private key of RSA 2048-bit and it's only with the author not in the binary.  
+
+
+Then the malware imports first the public and private key of RSA 1024-bit into **CSP**.  
+![alt text](image-21.png)
+The first call is to import the public and private key of the RSA 1024-bit,The secound call is to import the public master key of the RSA 2048-bit.  
+Then the malware uses **CryptEncrypt** to encrypts the private key of RSA 1024-bit using the public key of RSA 2048-bit.  
 
 Next the malware disable windows defender real-time scanning and core services by editing registry **"SOFTWARE\Policies\Microsoft\Windows Defender"** and set it to **"DisableAntiSpyware"**
 ![alt text](image-14.png)
@@ -127,11 +139,55 @@ Then the malware deletes any snapshot or shadow copy the host has by excuting th
 
 ![alt text](image-16.png)
 After that we have 4 major subroutine
-* **1-** The first one is to get the path to the startup folder and store it **C:\Users\User\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\\**
-* **2-** The secound one is to store the message on the .txt file we talked about earlier and to make your id for contact operator
-* **3-** The third is to copy the malware into the startup folder and rename it to a random name
-* **4-** The fourth one is to terminate every process and encrypts the files and put the .txt file in each folder,This is where the malware finally exits and delete itself after finshing the encryption.  
+### 1- sub_402B20
+![alt text](image-22.png)
+The malware starts by getting the path to **C:\Users\User\AppData\Roaming** by **SHGetFolderPathW** and the add **\taridd** to it and then check if it exists, if it exists the malware just reads it and store it if not the malware calls **sub_4029C0** which generates random 6 characters and then write the file and six characters to it.
 
+### 2- sub_402D00
+The secound one is to store the message on the .txt file we talked about earlier and to make your id for contact operator.  
+
+
+### 3- sub_402BE0
+![alt text](image-23.png)
+The malware first get the path to itself then get the path to the startup folder then it calls **sub_401040** and **sub_402A60** to generate a random name then it copy itself to the startup folder using **CopyFileW**.  
+
+### 4- sub_401EF0
+The malware first see the process using **Process32NextW** and compare it with a list of processes 
+|mysql|IBM|bes10|black|sql|store.exe|vee|postg|sage|
+|-----|---|-----|-----|---|---------|---|-----|----|
+
+if it is one of the process listed the process will be terminated using **TerminateProcess**.  
+And it checks for the services under the same name if it found one it will call **ControlService** with **SERVICE_CONTROL_STOP** as **dwControl**.![alt text](image-30.png)
+
+
+Then the malware call **SHGetFolderPathW** to get the path to the **Desktop** then it calls **sub_402720**
+### sub_402720
+The malware here gets all drives and get the type of it![alt text](image-24.png)
+if **EAX** is **4** **DRIVE_REMOTE** or **2** **DRIVE_REMOVABLE** or **3** **DRIVE_FIXED** the malware will work on it,it ignores any other type of memory.  
+The malware then make thread that has **StartAddress** which is the encryption function at address **0x0402470** then it increaments **EDI**,![alt text](image-25.png)  
+The maximum number of threads per time is **4** if there are 4 threads the malware will wait using  **WaitForMultipleObjects**.  
+
+
+### StartAddress at address 0x0402470
+The Malware first upload 5 strings into an array **Windows,$Recycle.bin,System Volume Information,Program Files,Program Files (x86)** then it takes the thread parameter which will be the drive the thread is working on and append **\*** to it using **wnsprintfW** then the malware calls **FindFirstFileW** to get the first file of the drive.  
+The malware then go into do while loop each time it compares the file found by **FindNextFileW** with the five strings we found earlier, if it's one of the 5 strings it skips the encryption so the malware doesn't encrypt the core system.  
+![alt text](image-26.png)
+Then the malware compares if it there is any sub-folder or not to prevent infinite-loop , if it found any sub-folders it calls itself again with the new constructed path and the parent caller goes to **FindNextFileW**.  
+If the malware found a file it checks it's attribute and checks if the file is already encrypted using it's own unique extension or the file is **---==%$$$OPEN_ME_UP$$$==---.txt** or **taridd** if it's one of those it skips the encryption,if not it calls **sub_402190** which is the core encryption.![alt text](image-27.png)  
+
+### sub_402190
+The function starts by checking if the file is already encrypted using extention,then it opens the file with READ\WRITE access.
+Then it calls **sub_401150** to generate custom symmetric key and then the malware encrypt that key using the **RSA 1024-bit** key by **CryptEncrypt**.
+Then the malware reads the first 10KB of the file using **ReadFile**  and calls **sub_401680** to apply the encryption.  
+Then it calls **WriteFile** to write the first 10KB of the file ![alt text](image-28.png).  
+Then it writes it's configurations , RSA key and mark to the end of the file and then it renames the file with it's extension ![alt text](image-29.png).  
+ 
+After **sub_402190** finishes the malware go back to **StartAddress** to call **sub_4023C0** which write **---==%$$$OPEN_ME_UP$$$==---.txt** to the folder.
+
+
+Then the malware calls **sub_401A80** and pass a URL **https://iplogger.org/1AsWy7**.
+### sub_401A80
+This function first calls **sub_4018C0** and pass the URL to it to split the url into **iplogger.org** and **1AsWy7** then  it calls **InternetOpenW** and then calls **InternetConnectW** with **lpszServerName** as **iplogger.org** then it opens **GET** request and send it to **1AsWy7** this makes the attacker stores data about the infected machines.
 
 # IoCs
 |Type    |Indicator|Description|
@@ -140,3 +196,6 @@ After that we have 4 major subroutine
 |File path|C:\Users\User\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\\ |Drop a copy of itself in the startup folder under a random name|
 |Registry|SOFTWARE\Policies\Microsoft\Windows Defender|Disable Windows defender|
 |File dropped|---==%$$$OPEN_ME_UP$$$==---.txt|Drops this file after encryption as instructions for contacting the author|
+|Strings|Windows,$Recycle.bin,System Volume Information,Program Files,Program Files (x86)|Malware avoid to encrypts these|
+|URL|https://iplogger.org/1AsWy7|Attacker uses this to know the infected machines|
+|Request type| GET | Attacker make a GET request|

@@ -15,10 +15,10 @@
   pageRef = "/"
   weight = 1
 
-#[[main]]
-#  name = "Posts"
-#  pageRef = "Posts"
-#  weight = 2
+[[main]]
+  name = "Malwares"
+  pageRef = "Posts"
+  weight = 2
 
 #[[main]]
 #  name = "example sub-menu 1"
